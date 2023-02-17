@@ -1,0 +1,290 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-02-17T08:04:38Z'
+  template_groups:
+    -
+      uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
+      name: Templates/Power
+  templates:
+    -
+      uuid: 132ad04ba75b4b4491589d51b5579a24
+      template: 'CyberPower PDU81404 SNMP'
+      name: 'CyberPower PDU81404 SNMP'
+      description: |
+        # Zabbix-Template-for-CyberPower-PDU81404
+        
+        ---
+        Items (8): 
+        PDU Input Frequency		
+        PDU Input Voltage		
+        PDU Load Apparent power		
+        PDU Load Power		
+        PDU Load Voltage		
+        PDU Model Name		
+        PDU peak phase load
+        PDU Serial Number
+        ---
+        Triggers (1):  
+        High level phase load on pdu
+        ---
+        Discovery items(1):   
+        Port discovery
+        ---
+        Discovery items(3):  
+        Port PDU {#PDU_PORTNAME}: Energy consumption  
+        Port PDU {#PDU_PORTNAME}: Outlet Active Power  
+        Port PDU {#PDU_PORTNAME}: Outlet load Amps  
+        ---
+        Discovery triggers(1):  
+        Port PDU {#PDU_PORTNAME}: Low Active Power
+        ---
+        Graphs (3):  
+        Port {#PDU_PORTNAME} Energy Consumption  
+        Port {#PDU_PORTNAME} Outlet active Power  
+        Port {#PDU_PORTNAME} Outlet load in Amps  
+        ---
+        Author  
+        Byshido84
+      groups:
+        -
+          name: Templates/Power
+      items:
+        -
+          uuid: 0563f4aefecf4c93b4bb93108eed72f3
+          name: 'PDU Load Apparent power'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3808.1.1.6.4.4.1.8.1
+          key: pdu.Apparent.power
+          units: VA
+          description: |
+            Полная мощность нагрузки в вольтамперах (VA),
+            потребляется на Rack PDU
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: 72f0d4c5c3b24aed9f2827420e464491
+          name: 'PDU Input Frequency'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3808.1.1.3.5.8.0
+          key: pdu.input.frequency
+          value_type: FLOAT
+          units: Hz
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: 64169749a49b4099b7a30274cc75481b
+          name: 'PDU Input Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3808.1.1.3.5.7.0
+          key: pdu.input.voltage
+          value_type: FLOAT
+          units: V
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: a4943d3cd31a4d1fb2a8838c7893f532
+          name: 'PDU Load Power'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.3808.1.1.6.4.4.1.7.1'
+          key: pdu.load.power
+          value_type: FLOAT
+          units: W
+          description: |
+            Указывает мощность нагрузки в ваттах,
+            потребляется на запрашиваемой фазе Rack PDU
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: 479ea3ccda1240cbba8df93c719c0afd
+          name: 'PDU Load Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3808.1.1.6.4.4.1.6.1
+          key: pdu.load.voltage
+          units: V
+          description: 'Напряжение на PDU'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: 6c3b565843c84e658045f851f3742b8d
+          name: 'PDU Model Name'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.3808.1.1.6.2.2.1.9.1'
+          key: pdu.model.name
+          delay: 24h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+        -
+          uuid: 33e925743bf94cfb94bf21ca83407bd0
+          name: 'PDU peak phase load'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3808.1.1.6.4.4.1.10.1
+          key: pdu.peak.load.phase
+          units: A
+          description: 'Пиковый ток фазной нагрузки на Rack PDU'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+          triggers:
+            -
+              uuid: e98cda965c1e4d44a66a81ca62cd7124
+              expression: 'last(/CyberPower PDU81404 SNMP/pdu.peak.load.phase)>12'
+              name: 'High level phase load'
+              priority: HIGH
+              tags:
+                -
+                  tag: PDU
+                  value: Warning
+        -
+          uuid: df07dc93bfe74b60950bb1877a9d3e6f
+          name: 'PDU Serial Number'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.3808.1.1.6.2.2.1.10.1'
+          key: pdu.serial.number
+          delay: 24h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: PDU
+              value: Appliance
+      discovery_rules:
+        -
+          uuid: 3cba82b505424637b118f68949b960d2
+          name: 'Port discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PDU_PORTNAME},1.3.6.1.4.1.3808.1.1.3.3.4.1.1.2,{#PDU_PORTSTAT},1.3.6.1.4.1.3808.1.1.3.3.3.1.1.4]'
+          key: pdu.port.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#PDU_PORTSTAT}'
+                value: '{$PDU.PORTSTAT.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 157d2710a90e4296ae8408606cd18756
+              name: 'Port PDU {#PDU_PORTNAME}: Outlet Active Power'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.3808.1.1.3.3.5.1.1.8.{#SNMPINDEX}'
+              key: 'pdu.port.outletActivePower[{#SNMPINDEX}]'
+              units: W
+              description: 'Нагрузка на розетку в Ваттах'
+              tags:
+                -
+                  tag: PDU
+                  value: Watt
+              trigger_prototypes:
+                -
+                  uuid: b2d4b5dcbfec412187c0fbd13e2b4c44
+                  expression: 'avg(/CyberPower PDU81404 SNMP/pdu.port.outletActivePower[{#SNMPINDEX}],5m)=0'
+                  name: 'Port PDU {#PDU_PORTNAME}: Low Active Power'
+                  priority: DISASTER
+                  tags:
+                    -
+                      tag: PDU
+                      value: Warning
+            -
+              uuid: 9440cad4797e4d2397d78dcba248c750
+              name: 'Port PDU {#PDU_PORTNAME}: Energy consumption'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.3808.1.1.3.3.5.1.1.13.{#SNMPINDEX}'
+              key: 'pdu.port.outletEnergyConsumption[{#SNMPINDEX}]'
+              delay: 30m
+              units: kWh
+              description: 'Счетчик энергии, измеряющий энергопотребление нагрузки Rack PDU'
+              tags:
+                -
+                  tag: PDU
+                  value: kWh
+            -
+              uuid: 84d06f706e3d422c951661a1a5a6e1f5
+              name: 'Port PDU {#PDU_PORTNAME}: Outlet load Amps'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.3808.1.1.3.3.5.1.1.7.{#SNMPINDEX}'
+              key: 'pdu.port.outletStatusLoad[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: A
+              description: 'Нагрузка на розетку в десятых долях ампер.'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+              tags:
+                -
+                  tag: PDU
+                  value: Amps
+          graph_prototypes:
+            -
+              uuid: d296229d90cc4185b1039e57923abc91
+              name: 'Port {#PDU_PORTNAME} Energy Consumption'
+              graph_items:
+                -
+                  color: 7986CB
+                  calc_fnc: ALL
+                  item:
+                    host: 'CyberPower PDU81404 SNMP'
+                    key: 'pdu.port.outletEnergyConsumption[{#SNMPINDEX}]'
+            -
+              uuid: 000c9067c8f64bcf9c2b779dcefcb2b8
+              name: 'Port {#PDU_PORTNAME} Outlet active Power'
+              graph_items:
+                -
+                  color: 199C0D
+                  calc_fnc: ALL
+                  item:
+                    host: 'CyberPower PDU81404 SNMP'
+                    key: 'pdu.port.outletActivePower[{#SNMPINDEX}]'
+            -
+              uuid: ab24f43dcab24b53be75ee1bbc5e09d2
+              name: 'Port {#PDU_PORTNAME} Outlet load in Amps'
+              graph_items:
+                -
+                  color: 3F51B5
+                  item:
+                    host: 'CyberPower PDU81404 SNMP'
+                    key: 'pdu.port.outletStatusLoad[{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$PDU.PORTSTAT.NOT_MATCHES}'
+          value: '2'
+          description: immedateOff
