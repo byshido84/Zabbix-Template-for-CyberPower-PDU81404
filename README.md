@@ -1,4 +1,4 @@
-# Zabbix-Template-for-CyberPower-PDU81404
+# Zabbix Template for CyberPower PDU81404
 
 
 Items (8):   
