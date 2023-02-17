@@ -1,0 +1,1 @@
+# Zabbix-Template-for-CyberPower-PDU81404
